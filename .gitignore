@@ -1,0 +1,9 @@
+build/
+*.apk
+*.idsig
+local.properties
+*.iml
+.idea/
+.gradle/
+.DS_Store
+Thumbs.db
