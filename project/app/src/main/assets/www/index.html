@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Dayloop</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="app-header">
+  <div class="brand">
+    <img src="logo.png" alt="Dayloop" class="brand-logo">
+    <div>
+      <h1>Dayloop</h1>
+      <p class="date-line" id="dateLine"></p>
+    </div>
+  </div>
+  <div class="header-right">
+    <button id="btnTheme" class="theme-btn" aria-label="Ganti tema">&#9728;</button>
+    <div class="header-streak" id="headerStreak" title="Total check-in hari ini"></div>
+  </div>
+</header>
+
+<main>
+  <!-- TAB: HARI INI -->
+  <section id="tab-today" class="tab active">
+    <p class="hint">Ketuk + setiap selesai melakukan habit</p>
+    <div id="todayList" class="habit-list"></div>
+    <div id="todayEmpty" class="empty hidden">
+      <div class="empty-icon">&#127793;</div>
+      <p>Belum ada habit.<br>Ketuk tombol + untuk mulai membangun kebiasaan.</p>
+    </div>
+  </section>
+
+  <!-- TAB: KALENDER -->
+  <section id="tab-calendar" class="tab">
+    <h2 class="section-title">Kalender</h2>
+    <p class="hint">Ketuk tanggal untuk melihat kegiatan hari itu</p>
+    <div class="cal-wrap">
+      <div class="cal-nav">
+        <button id="calPrev" class="cal-arrow" aria-label="Bulan sebelumnya">&#10094;</button>
+        <div class="cal-title" id="calTitle"></div>
+        <button id="calNext" class="cal-arrow" aria-label="Bulan berikutnya">&#10095;</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <div id="dayDetail" class="day-detail hidden"></div>
+  </section>
+
+  <!-- TAB: STATISTIK -->
+  <section id="tab-stats" class="tab">
+    <h2 class="section-title">Statistik</h2>
+    <div class="stat-grid">
+      <div class="stat-card"><span class="stat-num" id="statRate7">-</span><span class="stat-label">Selesai 7 hari</span></div>
+      <div class="stat-card"><span class="stat-num" id="statRate30">-</span><span class="stat-label">Selesai 30 hari</span></div>
+      <div class="stat-card"><span class="stat-num" id="statBest">-</span><span class="stat-label">Streak terpanjang</span></div>
+      <div class="stat-card"><span class="stat-num" id="statTotal">-</span><span class="stat-label">Total check-in</span></div>
+    </div>
+    <h2 class="section-title">Tren 8 minggu terakhir</h2>
+    <div class="chart" id="weekChart"></div>
+    <h2 class="section-title">Streak per habit</h2>
+    <div id="streakList" class="streak-list"></div>
+    <div id="archivedBox" class="hidden">
+      <h2 class="section-title">Diarsipkan</h2>
+      <div id="archivedList" class="streak-list"></div>
+    </div>
+    <h2 class="section-title">Data</h2>
+    <div class="data-box">
+      <button id="btnBackup" class="btn ghost">Backup data</button>
+      <button id="btnRestore" class="btn ghost">Restore data</button>
+      <button id="btnExportCsv" class="btn ghost">Export CSV</button>
+      <button id="btnExportPdf" class="btn ghost">Export PDF</button>
+    </div>
+  </section>
+</main>
+
+<button id="fab" class="fab" aria-label="Tambah habit">+</button>
+
+<!-- MODAL FORM HABIT -->
+<div id="modal" class="modal hidden">
+  <div class="modal-card">
+    <h2 id="modalTitle">Habit baru</h2>
+    <label class="field"><span>Nama habit</span>
+      <input type="text" id="fName" maxlength="40" placeholder="cth: Baca buku 20 menit">
+    </label>
+    <label class="field"><span>Icon</span></label>
+    <div id="fIcon" class="icon-picker"></div>
+    <label class="field"><span>Warna</span></label>
+    <div id="fColor" class="color-picker"></div>
+    <div class="row2">
+      <label class="field"><span>Target / minggu</span>
+        <select id="fTarget">
+          <option value="1">1x</option><option value="2">2x</option><option value="3">3x</option>
+          <option value="4">4x</option><option value="5" selected>5x</option>
+          <option value="6">6x</option><option value="7">7x</option>
+        </select>
+      </label>
+      <label class="field"><span>Pengingat (opsional)</span>
+        <input type="time" id="fReminder">
+      </label>
+    </div>
+    <div id="noteRow" class="hidden">
+      <label class="field"><span>Catatan hari ini (opsional)</span>
+        <textarea id="fNote" rows="2" maxlength="140" placeholder="cth: Lari 2 km"></textarea>
+      </label>
+    </div>
+    <div id="moveRow" class="move-row hidden">
+      <span>Urutan</span>
+      <div>
+        <button id="btnUp" class="btn ghost small" type="button">&#9650; Naik</button>
+        <button id="btnDown" class="btn ghost small" type="button">&#9660; Turun</button>
+      </div>
+    </div>
+    <div class="modal-actions secondary">
+      <button id="btnDelete" class="btn danger hidden">Hapus</button>
+      <button id="btnArchive" class="btn ghost hidden">Arsipkan</button>
+    </div>
+    <div class="modal-actions">
+      <div class="spacer"></div>
+      <button id="btnCancel" class="btn ghost">Batal</button>
+      <button id="btnSave" class="btn primary">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BACKUP/RESTORE -->
+<div id="dataModal" class="modal hidden">
+  <div class="modal-card">
+    <h2 id="dataTitle">Backup data</h2>
+    <p class="hint" id="dataHint" style="text-align:left;margin-bottom:10px"></p>
+    <textarea id="dataText" rows="8" class="data-text" spellcheck="false"></textarea>
+    <p class="hint" id="dataStatus" style="min-height:1.2em"></p>
+    <div class="modal-actions">
+      <div class="spacer"></div>
+      <button id="btnCloseData" class="btn ghost">Tutup</button>
+      <button id="btnCopyData" class="btn primary">Salin</button>
+      <button id="btnDoRestore" class="btn primary hidden">Pulihkan</button>
+    </div>
+  </div>
+</div>
+
+<nav class="tabbar">
+  <button class="tab-btn active" data-tab="today"><span class="ticon">&#10003;</span><span>Hari ini</span></button>
+  <button class="tab-btn" data-tab="calendar"><span class="ticon">&#128197;</span><span>Kalender</span></button>
+  <button class="tab-btn" data-tab="stats"><span class="ticon">&#128202;</span><span>Statistik</span></button>
+</nav>
+
+<script src="app.js"></script>
+</body>
+</html>
